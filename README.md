@@ -352,7 +352,7 @@ stock-forecast-dashboard/
 
 ```bash
 # 1️⃣ Clone the repository
-git clone https://github.com/yourusername/stock-forecast-dashboard.git
+git clone https://github.com/dinraj910/stock-forecast-dashboard.git
 cd stock-forecast-dashboard
 
 # 2️⃣ Create virtual environment (recommended)
@@ -568,7 +568,7 @@ Contributions are what make the open-source community an amazing place to learn,
 
 1. **Fork the Project**
    ```bash
-   git fork https://github.com/yourusername/stock-forecast-dashboard.git
+   git fork https://github.com/dinraj910/stock-forecast-dashboard.git
    ```
 
 2. **Create your Feature Branch**
@@ -625,15 +625,15 @@ MIT License - Free to use, modify, and distribute
 
 <div align="center">
 
-### **Your Name**
+### **DINRAJ K DINESH**
 
 *Full Stack Developer | Machine Learning Engineer | Finance Enthusiast*
 
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/yourusername)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/yourprofile)
-[![Portfolio](https://img.shields.io/badge/Portfolio-FF7139?style=for-the-badge&logo=Firefox&logoColor=white)](https://yourportfolio.com)
-[![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:your.email@example.com)
-[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/yourusername)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/dinraj910)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/dinraj910)
+[![Portfolio](https://img.shields.io/badge/Portfolio-FF7139?style=for-the-badge&logo=Firefox&logoColor=white)](https://github.com/dinraj910)
+[![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:dinrajdinesh564@gmail.com)
+[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/dinraj910)
 
 </div>
 
@@ -718,7 +718,7 @@ Special thanks to the following resources and communities:
 
 <div align="center">
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/stock-forecast-dashboard&type=Date)](https://star-history.com/#yourusername/stock-forecast-dashboard&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=dinraj910/stock-forecast-dashboard&type=Date)](https://star-history.com/#dinraj910/stock-forecast-dashboard&Date)
 
 </div>
 
@@ -732,9 +732,9 @@ Give a ⭐️ if this project helped you learn or build something amazing!
 
 **Share with the community:**
 
-[![GitHub](https://img.shields.io/badge/Star_on_GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/yourusername/stock-forecast-dashboard)
-[![Twitter](https://img.shields.io/badge/Share_on_Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/intent/tweet?text=Check%20out%20this%20amazing%20Stock%20Forecast%20Dashboard!&url=https://github.com/yourusername/stock-forecast-dashboard)
-[![LinkedIn](https://img.shields.io/badge/Share_on_LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/sharing/share-offsite/?url=https://github.com/yourusername/stock-forecast-dashboard)
+[![GitHub](https://img.shields.io/badge/Star_on_GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/dinraj910/stock-forecast-dashboard)
+[![Twitter](https://img.shields.io/badge/Share_on_Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/intent/tweet?text=Check%20out%20this%20amazing%20Stock%20Forecast%20Dashboard!&url=https://github.com/dinraj910/stock-forecast-dashboard)
+[![LinkedIn](https://img.shields.io/badge/Share_on_LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/sharing/share-offsite/?url=https://github.com/dinraj910/stock-forecast-dashboard)
 
 ### 🚀 **"Predicting the future, one stock at a time"**
 
