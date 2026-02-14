@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Row -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-2"><i class="bi bi-graph-up"></i> Price Forecast</h1>
+            <p class="text-muted">Generate multi-day recursive forecasts using our LSTM model</p>
+        </div>
+    </div>
+
+    <!-- Controls Row -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card controls-card">
+                <div class="card-body">
+                    <form id="forecastForm" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="forecastTicker" class="form-label">Stock Ticker</label>
+                            <input type="text" class="form-control form-control-lg" id="forecastTicker" 
+                                   value="{{ default_ticker }}" placeholder="AAPL">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="forecastHorizon" class="form-label">Forecast Days</label>
+                            <select class="form-select form-select-lg" id="forecastHorizon">
+                                <option value="1">1 Day</option>
+                                <option value="3">3 Days</option>
+                                <option value="5" selected>5 Days</option>
+                                <option value="7">7 Days</option>
+                                <option value="14">14 Days</option>
+                                <option value="{{ max_horizon }}">{{ max_horizon }} Days</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="historyWindow" class="form-label">History Window</label>
+                            <select class="form-select form-select-lg" id="historyWindow">
+                                <option value="30">30 Days</option>
+                                <option value="60" selected>60 Days</option>
+                                <option value="90">90 Days</option>
+                                <option value="180">180 Days</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-lightning-charge"></i> Forecast
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card info-card h-100">
+                <div class="card-body">
+                    <h6><i class="bi bi-info-circle"></i> Model Information</h6>
+                    <ul class="list-unstyled mb-0 small">
+                        <li><strong>Architecture:</strong> LSTM (Many-to-One)</li>
+                        <li><strong>Input:</strong> 60-day OHLC window</li>
+                        <li><strong>Output:</strong> Next-day OHLC prediction</li>
+                        <li><strong>Confidence:</strong> 95% interval</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forecast Results -->
+    <div class="row mb-4" id="forecastResults" style="display: none;">
+        <!-- Summary Cards -->
+        <div class="col-12 mb-4">
+            <div class="row">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card summary-card">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted">Current Price</h6>
+                            <h2 id="fcCurrentPrice">--</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card summary-card">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted">Final Predicted</h6>
+                            <h2 id="fcFinalPrice">--</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card summary-card">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted">Predicted Change</h6>
+                            <h2 id="fcChange">--</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card summary-card trend-card" id="fcTrendCard">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted">Trend Signal</h6>
+                            <h2 id="fcTrend">--</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forecast Chart -->
+        <div class="col-lg-8 mb-4">
+            <div class="card chart-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-graph-up-arrow"></i> Forecast Visualization</h5>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-secondary" id="toggleConfidence">
+                            <i class="bi bi-shield-check"></i> Toggle CI
+                        </button>
+                        <button class="btn btn-outline-primary" id="downloadForecastCsv">
+                            <i class="bi bi-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="forecastChart" style="height: 450px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forecast Table -->
+        <div class="col-lg-4 mb-4">
+            <div class="card forecast-table-card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-table"></i> Daily Breakdown</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="sticky-top">
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Date</th>
+                                    <th>Open</th>
+                                    <th>High</th>
+                                    <th>Low</th>
+                                    <th>Close</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fcTableBody">
+                                <tr><td colspan="6" class="text-center">Run forecast to see results</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i> 
+                        Confidence intervals shown at 95% level
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Waiting State -->
+    <div class="row" id="waitingState">
+        <div class="col-12">
+            <div class="card waiting-card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-graph-up-arrow display-1 text-muted"></i>
+                    <h4 class="mt-4 text-muted">Ready to Generate Forecast</h4>
+                    <p class="text-muted">Enter a stock ticker and click "Forecast" to generate predictions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Range Analysis -->
+    <div class="row mb-4" id="rangeAnalysis" style="display: none;">
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-arrows-expand"></i> Predicted Range</h5>
+                </div>
+                <div class="card-body">
+                    <div id="rangeChart" style="height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-speedometer2"></i> Forecast Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="fcSummaryStats">
+                        <div class="col-6 mb-3">
+                            <div class="stat-item">
+                                <span class="stat-label">Max High</span>
+                                <span class="stat-value" id="fcMaxHigh">--</span>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="stat-item">
+                                <span class="stat-label">Min Low</span>
+                                <span class="stat-value" id="fcMinLow">--</span>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="stat-item">
+                                <span class="stat-label">Avg Close</span>
+                                <span class="stat-value" id="fcAvgClose">--</span>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="stat-item">
+                                <span class="stat-label">Price Range</span>
+                                <span class="stat-value" id="fcPriceRange">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/forecast.js') }}"></script>
+{% endblock %}

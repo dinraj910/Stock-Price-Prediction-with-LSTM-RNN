@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Row -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-2"><i class="bi bi-file-earmark-text"></i> Analysis Reports</h1>
+            <p class="text-muted">Generate comprehensive analysis reports and export data</p>
+        </div>
+    </div>
+
+    <!-- Report Generator -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-gear"></i> Generate Report</h5>
+                </div>
+                <div class="card-body">
+                    <form id="reportForm">
+                        <div class="mb-3">
+                            <label for="reportTicker" class="form-label">Stock Ticker</label>
+                            <input type="text" class="form-control" id="reportTicker" 
+                                   value="{{ default_ticker }}" placeholder="AAPL">
+                        </div>
+                        <div class="mb-3">
+                            <label for="reportHorizon" class="form-label">Forecast Horizon</label>
+                            <select class="form-select" id="reportHorizon">
+                                <option value="5" selected>5 Days</option>
+                                <option value="7">7 Days</option>
+                                <option value="14">14 Days</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Report Type</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="reportType" 
+                                       id="reportCsv" value="csv" checked>
+                                <label class="form-check-label" for="reportCsv">
+                                    <i class="bi bi-file-earmark-spreadsheet"></i> CSV Report (Detailed)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="reportType" 
+                                       id="reportForecast" value="forecast">
+                                <label class="form-check-label" for="reportForecast">
+                                    <i class="bi bi-table"></i> Forecast Data Only
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-download"></i> Generate & Download
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Report Contents</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Full CSV Report Includes:</h6>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item"><i class="bi bi-check-circle text-success"></i> Current stock price data</li>
+                        <li class="list-group-item"><i class="bi bi-check-circle text-success"></i> Multi-day forecast with confidence intervals</li>
+                        <li class="list-group-item"><i class="bi bi-check-circle text-success"></i> Technical indicators (MA, RSI, etc.)</li>
+                        <li class="list-group-item"><i class="bi bi-check-circle text-success"></i> Volatility metrics</li>
+                        <li class="list-group-item"><i class="bi bi-check-circle text-success"></i> Trend analysis summary</li>
+                    </ul>
+                    
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-lightbulb"></i>
+                        <strong>Tip:</strong> Use the forecast-only export for quick data imports into spreadsheets.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Section -->
+    <div class="row mb-4" id="reportPreview" style="display: none;">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-eye"></i> Report Preview</h5>
+                    <span class="badge bg-secondary" id="previewTicker">--</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Current Price -->
+                        <div class="col-md-4 mb-4">
+                            <div class="preview-section">
+                                <h6><i class="bi bi-currency-dollar"></i> Current Price</h6>
+                                <div class="preview-content" id="previewPrice">
+                                    Loading...
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Forecast Summary -->
+                        <div class="col-md-4 mb-4">
+                            <div class="preview-section">
+                                <h6><i class="bi bi-graph-up"></i> Forecast Summary</h6>
+                                <div class="preview-content" id="previewForecast">
+                                    Loading...
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Technical Analysis -->
+                        <div class="col-md-4 mb-4">
+                            <div class="preview-section">
+                                <h6><i class="bi bi-bar-chart"></i> Technical Analysis</h6>
+                                <div class="preview-content" id="previewTechnical">
+                                    Loading...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Export Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-lightning-charge"></i> Quick Export</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Quickly export data for popular stocks:</p>
+                    <div class="row">
+                        <div class="col-md-2 col-sm-4 col-6 mb-2">
+                            <button class="btn btn-outline-primary w-100 quick-export" data-ticker="AAPL">
+                                AAPL
+                            </button>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-6 mb-2">
+                            <button class="btn btn-outline-primary w-100 quick-export" data-ticker="MSFT">
+                                MSFT
+                            </button>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-6 mb-2">
+                            <button class="btn btn-outline-primary w-100 quick-export" data-ticker="GOOGL">
+                                GOOGL
+                            </button>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-6 mb-2">
+                            <button class="btn btn-outline-primary w-100 quick-export" data-ticker="AMZN">
+                                AMZN
+                            </button>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-6 mb-2">
+                            <button class="btn btn-outline-primary w-100 quick-export" data-ticker="NVDA">
+                                NVDA
+                            </button>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-6 mb-2">
+                            <button class="btn btn-outline-primary w-100 quick-export" data-ticker="TSLA">
+                                TSLA
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-secondary">
+                <h6><i class="bi bi-exclamation-triangle"></i> Important Notice</h6>
+                <p class="mb-0 small">{{ disclaimer }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const reportForm = document.getElementById('reportForm');
+    const reportPreview = document.getElementById('reportPreview');
+    
+    // Report form submission
+    reportForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const ticker = document.getElementById('reportTicker').value.toUpperCase();
+        const horizon = document.getElementById('reportHorizon').value;
+        const reportType = document.querySelector('input[name="reportType"]:checked').value;
+        
+        if (!ticker) {
+            StockDashboard.showToast('Please enter a ticker symbol', 'error');
+            return;
+        }
+        
+        StockDashboard.showLoading('Generating report...');
+        
+        try {
+            const endpoint = reportType === 'csv' ? '/api/download/report' : '/api/download/csv';
+            
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ticker, horizon: parseInt(horizon) })
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to generate report');
+            }
+            
+            // Download the file
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${ticker}_forecast_report.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+            
+            StockDashboard.showToast('Report downloaded successfully!', 'success');
+            
+            // Show preview
+            loadPreview(ticker, horizon);
+            
+        } catch (error) {
+            StockDashboard.showToast(error.message, 'error');
+        } finally {
+            StockDashboard.hideLoading();
+        }
+    });
+    
+    // Quick export buttons
+    document.querySelectorAll('.quick-export').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const ticker = this.dataset.ticker;
+            document.getElementById('reportTicker').value = ticker;
+            reportForm.dispatchEvent(new Event('submit'));
+        });
+    });
+    
+    // Load preview function
+    async function loadPreview(ticker, horizon) {
+        try {
+            const response = await fetch(`/forecast/analysis/${ticker}?days=90`);
+            const data = await response.json();
+            
+            if (!data.success) {
+                throw new Error(data.error);
+            }
+            
+            reportPreview.style.display = 'block';
+            document.getElementById('previewTicker').textContent = ticker;
+            
+            // Price preview
+            const latest = data.stock_info;
+            document.getElementById('previewPrice').innerHTML = `
+                <p><strong>Ticker:</strong> ${ticker}</p>
+                <p><strong>Sector:</strong> ${latest.sector || 'N/A'}</p>
+                <p><strong>Market Cap:</strong> ${formatMarketCap(latest.market_cap)}</p>
+            `;
+            
+            // Forecast preview
+            if (data.forecast) {
+                const fc = data.forecast.summary;
+                document.getElementById('previewForecast').innerHTML = `
+                    <p><strong>Latest Close:</strong> $${fc.latest_close}</p>
+                    <p><strong>Predicted Close:</strong> $${fc.final_predicted_close}</p>
+                    <p><strong>Change:</strong> <span class="${fc.total_change >= 0 ? 'text-success' : 'text-danger'}">${fc.total_change >= 0 ? '+' : ''}${fc.total_change_percent}%</span></p>
+                    <p><strong>Trend:</strong> <span class="badge ${fc.trend === 'Bullish' ? 'bg-success' : 'bg-danger'}">${fc.trend}</span></p>
+                `;
+            }
+            
+            // Technical preview
+            if (data.technical_analysis) {
+                const ta = data.technical_analysis;
+                document.getElementById('previewTechnical').innerHTML = `
+                    <p><strong>Trend:</strong> ${ta.trend.signal}</p>
+                    <p><strong>RSI:</strong> ${ta.rsi.rsi} (${ta.rsi.signal})</p>
+                    <p><strong>Support:</strong> $${ta.support_resistance.support_1}</p>
+                    <p><strong>Resistance:</strong> $${ta.support_resistance.resistance_1}</p>
+                `;
+            }
+            
+        } catch (error) {
+            console.error('Preview error:', error);
+        }
+    }
+    
+    function formatMarketCap(value) {
+        if (!value || value === 'N/A') return 'N/A';
+        if (value >= 1e12) return `$${(value / 1e12).toFixed(2)}T`;
+        if (value >= 1e9) return `$${(value / 1e9).toFixed(2)}B`;
+        if (value >= 1e6) return `$${(value / 1e6).toFixed(2)}M`;
+        return `$${value.toLocaleString()}`;
+    }
+});
+</script>
+{% endblock %}
