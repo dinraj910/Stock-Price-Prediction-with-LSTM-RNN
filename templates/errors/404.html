@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Page Not Found{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center" style="margin-top: 100px;">
+            <div class="error-page">
+                <h1 class="display-1" style="font-size: 120px; font-weight: 700; color: var(--accent-blue);">404</h1>
+                <h2 style="color: var(--text); margin-bottom: 20px;">Page Not Found</h2>
+                <p style="color: var(--text-secondary); font-size: 18px; margin-bottom: 30px;">
+                    Oops! The page you're looking for doesn't exist.
+                </p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-home"></i> Go Home
+                    </a>
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

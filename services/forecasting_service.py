@@ -111,9 +111,11 @@ class ForecastingService:
             
             # Inverse transform to get actual values
             prediction = self.preprocessing.inverse_transform(prediction_scaled)[0]
+            predicted_close = float(prediction[0]) if len(prediction.shape) > 0 else float(prediction)
             
             # Get latest actual values for comparison
             latest = data.iloc[-1]
+            latest_close = float(latest['Close'])
             
             # Calculate confidence interval (using estimated residual std)
             std_estimate = self._estimate_residual_std(data)
@@ -122,25 +124,19 @@ class ForecastingService:
                 'ticker': ticker,
                 'prediction_date': self._get_next_business_day(data.index[-1]).isoformat(),
                 'predicted': {
-                    'open': round(float(prediction[0]), 2),
-                    'high': round(float(prediction[1]), 2),
-                    'low': round(float(prediction[2]), 2),
-                    'close': round(float(prediction[3]), 2)
+                    'close': round(predicted_close, 2)
                 },
                 'confidence_interval': {
-                    'close_lower': round(float(prediction[3] - self.confidence_level * std_estimate), 2),
-                    'close_upper': round(float(prediction[3] + self.confidence_level * std_estimate), 2)
+                    'close_lower': round(predicted_close - self.confidence_level * std_estimate, 2),
+                    'close_upper': round(predicted_close + self.confidence_level * std_estimate, 2)
                 },
                 'latest_actual': {
                     'date': data.index[-1].isoformat(),
-                    'open': round(float(latest['Open']), 2),
-                    'high': round(float(latest['High']), 2),
-                    'low': round(float(latest['Low']), 2),
-                    'close': round(float(latest['Close']), 2)
+                    'close': round(latest_close, 2)
                 },
-                'change_predicted': round(float(prediction[3] - latest['Close']), 2),
+                'change_predicted': round(predicted_close - latest_close, 2),
                 'change_percent': round(
-                    float((prediction[3] - latest['Close']) / latest['Close'] * 100), 2
+                    (predicted_close - latest_close) / latest_close * 100, 2
                 ),
                 'timestamp': datetime.now().isoformat()
             }
@@ -203,7 +199,8 @@ class ForecastingService:
                 
                 # Store prediction (inverse transform)
                 pred_actual = self.preprocessing.inverse_transform(pred_scaled)[0]
-                predictions.append(pred_actual)
+                pred_close = float(pred_actual[0]) if len(pred_actual.shape) > 0 else float(pred_actual)
+                predictions.append(pred_close)
                 
                 # Calculate next business day
                 next_date = self._get_next_business_day(last_date, offset=i+1)
@@ -228,16 +225,13 @@ class ForecastingService:
                 forecast_table.append({
                     'day': i + 1,
                     'date': date.strftime('%Y-%m-%d'),
-                    'open': round(float(pred[0]), 2),
-                    'high': round(float(pred[1]), 2),
-                    'low': round(float(pred[2]), 2),
-                    'close': round(float(pred[3]), 2),
-                    'close_lower': round(float(pred[3] - ci_width), 2),
-                    'close_upper': round(float(pred[3] + ci_width), 2)
+                    'close': round(pred, 2),
+                    'close_lower': round(pred - ci_width, 2),
+                    'close_upper': round(pred + ci_width, 2)
                 })
             
             # Calculate summary statistics
-            close_predictions = [p[3] for p in predictions]
+            close_predictions = predictions
             latest_close = float(data['Close'].iloc[-1])
             
             result = {
@@ -246,13 +240,13 @@ class ForecastingService:
                 'forecast': forecast_table,
                 'summary': {
                     'latest_close': round(latest_close, 2),
-                    'final_predicted_close': round(float(close_predictions[-1]), 2),
-                    'total_change': round(float(close_predictions[-1] - latest_close), 2),
+                    'final_predicted_close': round(close_predictions[-1], 2),
+                    'total_change': round(close_predictions[-1] - latest_close, 2),
                     'total_change_percent': round(
-                        float((close_predictions[-1] - latest_close) / latest_close * 100), 2
+                        (close_predictions[-1] - latest_close) / latest_close * 100, 2
                     ),
-                    'max_predicted_high': round(float(max(p[1] for p in predictions)), 2),
-                    'min_predicted_low': round(float(min(p[2] for p in predictions)), 2),
+                    'max_predicted_close': round(max(predictions), 2),
+                    'min_predicted_close': round(min(predictions), 2),
                     'avg_predicted_close': round(float(np.mean(close_predictions)), 2),
                     'trend': 'Bullish' if close_predictions[-1] > latest_close else 'Bearish'
                 },
@@ -375,9 +369,9 @@ class ForecastingService:
             predictions = self.preprocessing.inverse_transform(predictions_scaled)
             actuals = self.preprocessing.inverse_transform(y_test)
             
-            # Calculate metrics for Close price (index 3)
-            close_pred = predictions[:, 3]
-            close_actual = actuals[:, 3]
+            # Extract Close price (single feature model)
+            close_pred = predictions.flatten()
+            close_actual = actuals.flatten()
             
             # RMSE
             rmse = float(np.sqrt(np.mean((close_actual - close_pred) ** 2)))

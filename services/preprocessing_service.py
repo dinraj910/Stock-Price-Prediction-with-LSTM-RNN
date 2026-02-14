@@ -35,7 +35,7 @@ class PreprocessingService:
             scaler_path: Path to saved scaler (or None to create new)
         """
         self.window_size = window_size
-        self.features = features or ['Open', 'High', 'Low', 'Close']
+        self.features = features or ['Close']  # Default to Close only
         self.num_features = len(self.features)
         self.scaler = None
         self.scaler_path = scaler_path

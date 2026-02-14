@@ -29,9 +29,9 @@ class Config:
     SCALER_PATH = MODELS_DIR / 'scaler.joblib'
     
     # LSTM Model Parameters (must match training)
-    WINDOW_SIZE = 60  # Lookback window (days)
-    FEATURES = ['Open', 'High', 'Low', 'Close']  # Feature order must match training
-    NUM_FEATURES = 4
+    WINDOW_SIZE = 100  # Lookback window (days)
+    FEATURES = ['Close']  # Feature order must match training - CLOSE ONLY!
+    NUM_FEATURES = 1
     
     # Forecasting Parameters
     DEFAULT_FORECAST_HORIZON = 5  # Days
